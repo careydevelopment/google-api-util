@@ -9,10 +9,25 @@ import org.slf4j.LoggerFactory;
 import us.careydevelopment.util.api.google.exception.GoogleApiException;
 import us.careydevelopment.util.api.google.model.GoogleAuthResponse;
 
+/**
+ * This utility class makes it easy to obtain the Credential object.
+ * Clients will need provide an ID. That's typically the User ID on the system.
+ *
+ * Then, the framework will use the DataStore object to retrieve the persisted
+ * StoredCredential.
+ *
+ * Google's code translates the StoredCredential to a Credential object.
+ */
 public class CredentialUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(CredentialUtil.class);
 
+    /**
+     * Gets the Credential associated with the ID.
+     *
+     * @param id
+     * @return Credential object
+     */
     public static Credential getCredential(String id) {
         Credential credential = null;
 
@@ -27,6 +42,18 @@ public class CredentialUtil {
         return credential;
     }
 
+    /**
+     * This method gets the Credential from the authorization code.
+     *
+     * The GoogleAuthResponse object includes both the authorization code and
+     * a redirect URL.
+     *
+     * This is the second step in an OAuth2 flow.
+     *
+     * @param auth
+     * @param id
+     * @return Credential object
+     */
     public static Credential getCredentialFromCode(GoogleAuthResponse auth, String id) {
         Credential credential = null;
 

@@ -1,4 +1,4 @@
-package us.careydevelopment.util.api.google;
+package us.careydevelopment.util.api.google.config;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -11,6 +11,15 @@ import us.careydevelopment.util.api.google.exception.GoogleApiConfigException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The configuration class for all API activities.
+ *
+ * THis class must be instantiated using the Builder. It's a singleton so only one object will
+ * ever exist.
+ *
+ * It's a good idea to instantiate this class with some initialization code within your
+ * application.
+ */
 public class GoogleApiConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(GoogleApiConfig.class);
@@ -23,6 +32,11 @@ public class GoogleApiConfig {
 
     private static GoogleApiConfig INSTANCE = null;
 
+    /**
+     * Private constructor to prevent outside instantiation.
+     *
+     * @param builder
+     */
     private GoogleApiConfig(Builder builder) {
         this.clientId = builder.clientId;
         this.clientSecret = builder.clientSecret;
@@ -39,6 +53,10 @@ public class GoogleApiConfig {
         instantiateDataStoreConfig();
     }
 
+    /**
+     * This data store holds the StoredCredential object that the
+     * application will use to obtain access to various Google properties.
+     */
     private void instantiateDataStoreConfig() {
         GoogleDataStoreConfig.Builder
                 .instance()
@@ -67,6 +85,11 @@ public class GoogleApiConfig {
         return scopes;
     }
 
+    /**
+     * Will only return the instance if the object has been created via the Builder.
+     *
+     * @return GoogleApiConfig instance
+     */
     public static GoogleApiConfig getInstance() {
         if (INSTANCE == null) {
             throw new GoogleApiConfigException("GoogleApiConfig not built yet!");
@@ -75,6 +98,16 @@ public class GoogleApiConfig {
         return INSTANCE;
     }
 
+    public static void shutdown() {
+        INSTANCE = null;
+    }
+
+    /**
+     * The Build class instantiates the GoogleApiConfig object.
+     *
+     * The setter methods all return an instance of this object so developers
+     * can use method chaining to instantiate the config object.
+     */
     public static class Builder {
 
         private String clientId;
