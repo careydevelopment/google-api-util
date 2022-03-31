@@ -7,7 +7,7 @@
     <name>Google API Utilities</name>
     <description>Utilities that make it easy to work with Google API</description>
     <url>https://github.com/careydevelopment/google-api-util</url>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <dependencies>
         <dependency>

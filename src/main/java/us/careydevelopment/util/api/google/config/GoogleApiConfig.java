@@ -1,5 +1,9 @@
 package us.careydevelopment.util.api.google.config;
 
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +12,8 @@ import us.careydevelopment.api.google.datastore.util.StoredCredentialPersister;
 import us.careydevelopment.api.google.datastore.util.StoredCredentialRetriever;
 import us.careydevelopment.util.api.google.exception.GoogleApiConfigException;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +35,9 @@ public class GoogleApiConfig {
     private StoredCredentialRetriever retriever;
     private StoredCredentialPersister persister;
     private List<String> scopes;
+    private HttpTransport transport;
+    private JsonFactory jsonFactory;
+    private String applicationName;
 
     private static GoogleApiConfig INSTANCE = null;
 
@@ -43,6 +52,9 @@ public class GoogleApiConfig {
         this.persister = builder.persister;
         this.retriever = builder.retriever;
         this.scopes = builder.scopes;
+        this.applicationName = builder.applicationName;
+        this.jsonFactory = builder.jsonFactory;
+        this.transport = builder.transport;
 
         instantiateDependencies();
 
@@ -85,6 +97,18 @@ public class GoogleApiConfig {
         return scopes;
     }
 
+    public HttpTransport getTransport() {
+        return transport;
+    }
+
+    public JsonFactory getJsonFactory() {
+        return jsonFactory;
+    }
+
+    public String getApplicationName() {
+        return applicationName;
+    }
+
     /**
      * Will only return the instance if the object has been created via the Builder.
      *
@@ -115,9 +139,28 @@ public class GoogleApiConfig {
         private StoredCredentialRetriever retriever;
         private StoredCredentialPersister persister;
         private List<String> scopes = new ArrayList<>();
+        private HttpTransport transport;
+        private JsonFactory jsonFactory = new GsonFactory();
+        private String applicationName;
 
         public static Builder instance() {
             return new Builder();
+        }
+
+        private Builder() {
+            setup();
+        }
+
+        private void setup() {
+            try {
+                this.transport = GoogleNetHttpTransport.newTrustedTransport();
+            } catch (IOException ie) {
+                LOG.error("IO problem when establishing transport!", ie);
+                throw new GoogleApiConfigException(ie.getMessage());
+            } catch (GeneralSecurityException ge) {
+                LOG.error("Security issue when establishing transport!", ge);
+                throw new GoogleApiConfigException(ge.getMessage());
+            }
         }
 
         public Builder setClientId(String clientId) {
@@ -142,6 +185,21 @@ public class GoogleApiConfig {
 
         public Builder setScopes(List<String> scopes) {
             this.scopes = scopes;
+            return this;
+        }
+
+        public Builder setTransport(HttpTransport transport) {
+            this.transport = transport;
+            return this;
+        }
+
+        public Builder setJsonFactory(JsonFactory factory) {
+            this.jsonFactory = factory;
+            return this;
+        }
+
+        public Builder setApplicationName(String applicationName) {
+            this.applicationName = applicationName;
             return this;
         }
 
